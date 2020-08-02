@@ -1,5 +1,4 @@
 # SATCollisions
-Practice learning and implementing Separated Axis Theorem collision detection.
 Simple project to learn and try out SAT collision detection with OpenGL.
 
 # Separated Axis Theorem explaination
