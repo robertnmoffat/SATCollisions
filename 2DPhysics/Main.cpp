@@ -56,7 +56,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		hDC = GetDC(hwnd);//get current device context
 		g_hdc = hDC;
 		setupPixelFormat(hDC);//setup pixel device context within function
-		
+
 		hRC = wglCreateContext(hDC);//create rendering context;
 		wglMakeCurrent(hDC, hRC);//make it the current rendering context for gl to draw to;
 		//make current NULL before deleting rendering context, and before posting the quit message		
@@ -96,17 +96,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-void drawObj(PhysObj obj){
+void drawObj(PhysObj obj) {
 	glTranslatef(obj.position.x, obj.position.y, 0.0f);
 	glRotatef(obj.rotation, 0.0f, 0.0f, 1.0f);
 
 	glBegin(GL_LINES);
-	for (int i = 0; i < obj.verts.size()-2; i++) {
-		glVertex2f(obj.verts[i], obj.verts[i+1]);
-		glVertex2f(obj.verts[i+2], obj.verts[i + 3]);
+	for (int i = 0; i < obj.verts.size() - 2; i++) {
+		glVertex2f(obj.verts[i], obj.verts[i + 1]);
+		glVertex2f(obj.verts[i + 2], obj.verts[i + 3]);
 		i += 1;
 	}
-	glVertex2f(obj.verts[obj.verts.size()-2], obj.verts[obj.verts.size()-1]);
+	glVertex2f(obj.verts[obj.verts.size() - 2], obj.verts[obj.verts.size() - 1]);
 	glVertex2f(obj.verts[0], obj.verts[1]);
 	glEnd();
 
@@ -116,9 +116,9 @@ void drawObj(PhysObj obj){
 //draw object by its manually manipulated world vectors
 void drawObjWorldVects(PhysObj obj) {
 	glBegin(GL_LINES);
-	for (int i = 0; i < obj.worldVerts.size(); i+=2) {
-		glVertex2f(obj.worldVerts[i], obj.worldVerts[(i + 1)%obj.worldVerts.size()]);
-		glVertex2f(obj.worldVerts[(i + 2)%obj.worldVerts.size()], obj.worldVerts[(i + 3)%obj.worldVerts.size()]);
+	for (int i = 0; i < obj.worldVerts.size(); i += 2) {
+		glVertex2f(obj.worldVerts[i], obj.worldVerts[(i + 1) % obj.worldVerts.size()]);
+		glVertex2f(obj.worldVerts[(i + 2) % obj.worldVerts.size()], obj.worldVerts[(i + 3) % obj.worldVerts.size()]);
 	}
 	glEnd();
 
@@ -127,13 +127,13 @@ void drawObjWorldVects(PhysObj obj) {
 
 
 //Create WinMain
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd){
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	//MessageBox(NULL, "Hello World!", "Window title?", NULL);
-	
+
 
 	PhysObj square;
 	square.rotation = 0.0f;
-	square.position = Vec2d{60,260};
+	square.position = Vec2d{ 60,260 };
 	square.verts.push_back(-20);
 	square.verts.push_back(-20);
 
@@ -145,7 +145,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 	square.verts.push_back(-20);
 	square.verts.push_back(20);
-	
+
 	setObjCenter(&square);
 	//square.center = Vec2d{ 0,0 };
 
@@ -192,7 +192,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	windowClass.hIconSm = LoadIcon(hInstance, IDI_WINLOGO);
 
 	RegisterClassEx(&windowClass);//register the window class
-	
+
 
 
 	//window creation
@@ -209,52 +209,43 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 	ShowWindow(hwnd, nShowCmd);
 
-	
 
-	float timeCounter = 0.0f;
+
+	double timeCounter = 0.0f;
 	GameTimer gt;
 	gt.init();
-	
+
 	//message loop with event handler
 	bool done = false;
 	float angle = 0.0;
 	while (!done) {
 		PeekMessage(&msg, hwnd, NULL, NULL, PM_REMOVE);//check for pending message
-		if(msg.message==WM_QUIT){
+		if (msg.message == WM_QUIT) {
 			done = true;
 		}
 		else {
+
+			double deltaTime = gt.getElapsedTimeInSeconds();
+			timeCounter += deltaTime;
+
 			//clear screen and depth buffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
 
-			float deltaTime = gt.getElapsedTimeInSeconds();
-			timeCounter += deltaTime;
-			if (timeCounter > (1/60)) {//limit to 60fps
-
-				//angle += 10.0f *deltaTime;//deltaTime;
-				if (angle > 360.0f)angle = 0.0f;
-
-				timeCounter = 0.0f;
-			}
-			
-			angle += 0.050f;// *deltaTime;//deltaTime;
+			angle += 50.050f*deltaTime;//deltaTime;
 			if (angle > 360.0f)angle = 0.0f;
 
-			//physObjs[0].rotation = angle;
-			physObjs[1].rotation = angle;
-			
-			//physObjs[1].position.y -= 0.01;
+			timeCounter = 0.0f;
 
-			
+			physObjs[1].rotation = angle;
+
+			//Update positions and rotations
 			updateWorldVerts(&physObjs[0]);
 			updateWorldVerts(&physObjs[1]);
 
-
+			//Check for collision, if there is, draw in red
 			if (Collision::SATCollision(physObjs[0], physObjs[1])) {
 				glColor3f(1.0f, 0.0f, 0.0f);
-				//MessageBox(NULL, "Collision!", "Window title?", NULL);
-				//MessageBox(hwnd, "Collision!", "collision", NULL);
 			}
 			else {
 				glColor3f(1.0f, 1.0f, 1.0f);
@@ -265,17 +256,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 				//drawObj(ob);
 			}
 
-			
-			
+
+
 
 
 			SwapBuffers(g_hdc);
+
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 	}
-
 
 	return msg.wParam;
 }

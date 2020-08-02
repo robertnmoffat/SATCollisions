@@ -27,13 +27,13 @@ public:
 		Returns the time in seconds since it was last called.
 		Call every frame for deltatime
 	*/
-	float getElapsedTimeInSeconds(unsigned long elapsedFrames = 1) {
+	double getElapsedTimeInSeconds(unsigned long elapsedFrames = 1) {
 		static LARGE_INTEGER lastTime = startTime;
 		LARGE_INTEGER current_time;
 
 		QueryPerformanceCounter(&current_time);
 
-		float seconds = ((float)current_time.QuadPart - (float)lastTime.QuadPart) / (float)ticksPerSecond.QuadPart;
+		double seconds = ((double)current_time.QuadPart - (double)lastTime.QuadPart) / (double)ticksPerSecond.QuadPart;
 
 		//reset timer
 		lastTime = current_time;
