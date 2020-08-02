@@ -13,9 +13,11 @@
 HDC g_hdc;//global handle to device context
 int g_width, g_height;//width and height of the window
 
-std::vector<PhysObj> physObjs;
+std::vector<PhysObj> physObjs;//Vector of objects to be drawn and collided
 
-
+/*
+	Sets up a pixel format descriptor so that a matching pixel format can be chosen for use
+*/
 void setupPixelFormat(HDC hdc) {
 	int nPixelFormat;
 
@@ -46,7 +48,9 @@ void setupPixelFormat(HDC hdc) {
 	SetPixelFormat(hdc, nPixelFormat, &pfd);
 }
 
-//create wndProc
+/*
+	Windows procedure
+*/
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	static HDC hDC;//handle to device context
 	static HGLRC hRC;//Handle to rendering context
@@ -113,7 +117,9 @@ void drawObj(PhysObj obj) {
 	glLoadIdentity();
 }
 
-//draw object by its manually manipulated world vectors
+/*
+	Draw object by its manually manipulated world vectors
+*/
 void drawObjWorldVects(PhysObj obj) {
 	glBegin(GL_LINES);
 	for (int i = 0; i < obj.worldVerts.size(); i += 2) {
@@ -126,11 +132,11 @@ void drawObjWorldVects(PhysObj obj) {
 
 
 
-//Create WinMain
+/*
+	Starting point for win32 application
+*/
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd) {
-	//MessageBox(NULL, "Hello World!", "Window title?", NULL);
-
-
+	//Setting up objects to be used in collision testing
 	PhysObj square;
 	square.rotation = 0.0f;
 	square.position = Vec2d{ 60,260 };
@@ -147,12 +153,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	square.verts.push_back(20);
 
 	setObjCenter(&square);
-	//square.center = Vec2d{ 0,0 };
 
 	physObjs.push_back(square);
 
 	PhysObj rect;
-	//rect.rotation = 315.0f;
 	rect.rotation = 340.0f;
 	rect.position = Vec2d{ 100,290 };
 	rect.verts.push_back(-40);
@@ -168,15 +172,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	rect.verts.push_back(2);
 
 	setObjCenter(&rect);
-	//rect.center = Vec2d{ 0,0 };
 
 	physObjs.push_back(rect);
 
 
 	MSG msg;
 
-	//class setup
-	//class registration
+	//------------class setup and class registration-------------
 	WNDCLASSEX windowClass;
 	windowClass.cbSize = sizeof(WNDCLASSEX);//set size to that of the window class structure
 	windowClass.style = CS_HREDRAW | CS_VREDRAW; //redraw on size
@@ -195,7 +197,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 
 
-	//window creation
+	//-------------window creation-------------
 	HWND hwnd = CreateWindowEx(NULL,
 		"MyClass",//window class name
 		"2D GL Physics",//window title
@@ -210,12 +212,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	ShowWindow(hwnd, nShowCmd);
 
 
-
+	//------Initialize game timer-----------
 	double timeCounter = 0.0f;
 	GameTimer gt;
 	gt.init();
 
-	//message loop with event handler
+	//------message loop with event handler--
 	bool done = false;
 	float angle = 0.0;
 	while (!done) {
@@ -232,7 +234,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
 
-			angle += 50.050f*deltaTime;//deltaTime;
+			angle += 50.050f*deltaTime;
 			if (angle > 360.0f)angle = 0.0f;
 
 			timeCounter = 0.0f;
@@ -252,16 +254,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 			}
 
 			for (auto ob : physObjs) {
+				//Draw objects either using manually generated world vertices, or using OpenGL matrices
 				drawObjWorldVects(ob);
 				//drawObj(ob);
 			}
 
-
-
-
-
 			SwapBuffers(g_hdc);
-
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
