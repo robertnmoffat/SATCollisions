@@ -18,3 +18,5 @@ representing that vertex' position on the normal. You then use these positions t
 of each polygon to see if there is overlap. Repeat the projections using a normal for each side of the two polygons, 
 checking for overlap. If there is any normal which the points do not have an overlap, then there is no collision. If 
 all checks have an overlap, then there is a collision.
+
+<img src="/SATCollisionExample.png" alt="example" title="Program Example">
