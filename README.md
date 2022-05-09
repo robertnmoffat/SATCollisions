@@ -2,7 +2,7 @@
 Simple project to learn and try out SAT collision detection with OpenGL.
 
 # Separated Axis Theorem explaination
-SAT is a pretty easy form of collision detection that basically allows you to apply the concepts of a 
+SAT is a pretty easy form of collision detection that allows you to apply the concepts of a 
 bounding box collision detection method to convex polygons which can be rotated and still have accurate detection.
 In order to achieve this, the idea is to basically squash all vertices of the two objects onto a one dimensional 
 plane and then use normal bounding box collision detection to see if the furthest points of each object overlap. 
@@ -15,6 +15,6 @@ the normal from the other side of the polygons, or squashing the polygons into t
 What we are calculating is the shadow which is cast upon the normal vector. This is done by taking the dot product 
 of each vertex vector and the normal and then dividing by the magnitude of the normal. This will give you a single number 
 representing that vertex' position on the normal. You then use these positions to compare the minimum and maximum 
-of each polygon to see if there is overlap. Repeat the projections using a normal for each side of two two polygons, 
+of each polygon to see if there is overlap. Repeat the projections using a normal for each side of the two polygons, 
 checking for overlap. If there is any normal which the points do not have an overlap, then there is no collision. If 
 all checks have an overlap, then there is a collision.
